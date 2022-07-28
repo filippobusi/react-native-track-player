@@ -24,11 +24,8 @@ function resolveImportedPath(path?: number | string) {
 
 // RN doesn't allow nullable NSNumbers so convert optional number parameters
 // to a conventional default.
-function optionalNumberToDefault(
-  num?: number,
-  defaultValue: number = -1,
-): number {
-  return num === undefined ? defaultValue : num;
+function optionalNumberToDefault(num?: number, defaultValue: number = -1): number {
+  return num === undefined ? defaultValue : num
 }
 
 // MARK: - General API
@@ -81,6 +78,7 @@ function isServiceRunning(): Promise<boolean> {
  */
 async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<number | void> {
   // Clone the array before modifying it
+  console.log('Enter in Lib add ' + tracks.length)
   if (Array.isArray(tracks)) {
     tracks = [...tracks]
   } else {
@@ -92,12 +90,21 @@ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise
   for (let i = 0; i < tracks.length; i++) {
     // Clone the object before modifying it
     tracks[i] = { ...tracks[i] }
-
+    console.log('Before Resolve URLS ' + tracks[i].url)
     // Resolve the URLs
-    tracks[i].url = resolveImportedPath(tracks[i].url)
-    tracks[i].artwork = resolveImportedPath(tracks[i].artwork)
+    try {
+      tracks[i].url = resolveImportedPath(tracks[i].url)
+    } catch (e) {
+      console.error(e)
+    }
+    console.log('Before Resolve ImportedPath ' + tracks[i].artwork)
+    try {
+      tracks[i].artwork = resolveImportedPath(tracks[i].artwork)
+    } catch (e) {
+      console.error(e)
+    }
   }
-
+  console.log('Add Track player track ' + JSON.stringify(tracks))
   // Note: we must be careful about passing nulls to non nullable parameters on Android.
   return TrackPlayer.add(tracks, optionalNumberToDefault(insertBeforeIndex))
 }
